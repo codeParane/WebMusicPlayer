@@ -1,0 +1,137 @@
+
+ <!DOCTYPE html>
+ 
+ <!-- author : codeParane -->
+ 
+ 
+<html>
+  <head>
+    <title>Music Player</title>  
+    <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+	<style>
+
+  body{margin: auto;background-color: #B9C9C8;}
+  .out{width:600px;height:200px;padding:0px;margin:100px auto;border:1px solid #fff;}
+  .cover{width:200px;height:200px;background-image: url("cover.jpg");}
+  .file{height: 50px;text-align: center;}
+  .player{width:400px;height:200px;float: right;background:#fff;margin-top:-200px;}
+  .time{width:380px;padding:0 10px;font-family: comic sans ms;font-weight: bold;font-size: 10pt;}
+  .time1{color: #000;}
+  .time2{float:right;color:#129AFD;}
+  #progress{height: 10px;background: #D3DAE0;width:380px;margin:0 10px;border-radius: 4px;}
+  button{background: #424342;border: none;width: 40px;height: 40px;border-radius:50%;
+  text-align: center;color:#fff;font-size: 12pt;font-weight: bold;}
+  .button1{background: #424342;border: none;width: 60px;height: 60px;border-radius:50%;font-size: 16pt;}
+  #controls{text-align: center;}
+  #player{text-align: center;}
+	</style>
+  </head>
+<body>
+  <div class="out">
+    <div class="cover"></div>
+    <div class="player">
+      <div class="file" id="file">
+        <input type="file" id="chooser" accept="audio/*"><br/>
+      </div>
+      <div class="bar" id="bar">
+        <div class="time"><span id="current-time" class="time1">00:00</span>
+        <span id="duration" class="time2">05:00</span></div>
+        <div class="prog"><canvas id="progress" width="500px" height="20px"></canvas></div>
+        
+      </div>
+      <div class="controls" id="controls">
+          <button onclick="stop_aud()" id="stop_button">#</button>
+          <button onclick="pause_aud()" id="pause_button">II</button>
+          <button onclick="play_au()" id="play_button" class="button1">></button>        
+          <button onclick="upVolume()" id="vUp_button">+</button>
+          <button onclick="doVolume()" id="vDown_button">-</button>
+      </div>
+      <div id='player'>
+          <audio id="music_player" controls autoplay ontimeupdate="updateBar()"></audio> 
+      </div>
+    </div>
+  </div>
+
+
+   
+
+
+<script type="text/javascript">
+
+
+document.addEventListener("DOMContentLoaded", function() { startplayer(); }, false);  
+var player;
+var audioElm = document.getElementById("music_player");
+var canvasWidth = 500;
+var audioEl = document.getElementById("music_player");
+var canvas = document.getElementById("progress").getContext('2d');
+
+// Initialise the progress bar
+audioEl.addEventListener('loadedmetadata', function() {
+  var duration = audioEl.duration
+  var currentTime = audioEl.currentTime
+  document.getElementById("duration").innerHTML = convertElapsedTime(duration)
+  document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime)
+  canvas.fillRect(0, 0, canvasWidth, 50);
+});
+
+// Manipulate the Update Bar According to the duration
+function updateBar() {
+  canvas.clearRect(0, 0, canvasWidth, 50)
+  canvas.fillStyle = "#D3DAE0";
+  canvas.fillRect(0, 0, canvasWidth, 50)  
+  var currentTime = audioEl.currentTime
+  var duration = audioEl.duration
+  
+  if (currentTime === duration) {
+    ctrl.innerHTML = "Play"
+  }
+        
+document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime)
+  var percentage = currentTime / duration
+  var progress = (canvasWidth * percentage)
+  canvas.fillStyle = "#129AFD"
+  canvas.fillRect(0, 0, progress, 50)
+}
+
+// Calculate the Elapsed Time
+function convertElapsedTime(inputSeconds) {
+  var seconds = Math.floor(inputSeconds % 60)
+  if (seconds < 10) {
+    seconds = "0" + seconds
+  }
+  var minutes = Math.floor(inputSeconds / 60)
+  return minutes + ":" + seconds
+}
+
+// Initialize the Player
+function startplayer() {
+ player = document.getElementById('music_player');
+ player.controls = true;
+}
+
+// Control Player
+function play_au() { player.play(); }
+function pause_aud() { player.pause(); }
+function stop_aud() { player.pause();  player.currentTime = 0; }
+function upVolume() { if (player.volume < 1) { player.volume += 0.1; }}
+function doVolume() { if (player.volume > 0){ player.volume -= 0.1; }}
+
+
+// Get the File Path and Assign to Player src
+$('#chooser').on('change', function (e) {
+  var target = e.currentTarget;
+  var file = target.files[0];
+  var reader = new FileReader();
+  if (target.files && file) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+          $("#music_player").attr('src', e.target.result);
+      };
+      reader.readAsDataURL(file);
+  }
+});
+
+</script>
+</body>
+</html>
